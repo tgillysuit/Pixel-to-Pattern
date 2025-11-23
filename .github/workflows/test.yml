@@ -137,4 +137,37 @@ jobs:
     steps:
       - name: Display test results
         run: |
+          echo "## Test Results Summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
           
+          if [ "${{ needs.backend-unit-tests.result }}" == "success" ]; then
+            echo "PASSED! Backend Unit Tests: Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "FAILED! Backend Unit Tests: ${{ needs.backend-unit-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ needs.frontend-unit-tests.result }}" == "success" ]; then
+            echo "PASSED! Frontend Unit Tests: Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "FAILED! Frontend Unit Tests: ${{ needs.frontend-unit-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ needs.integration-tests.result }}" == "success" ]; then
+            echo "PASSED! Integration Tests: Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "FAILED! Integration Tests: ${{ needs.integration-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          fi
+          
+          if [ "${{ needs.e2e-tests.result }}" == "success" ]; then
+            echo "PASSED! E2E Tests: Passed" >> $GITHUB_STEP_SUMMARY
+          else
+            echo "FAILED! E2E Tests: ${{ needs.e2e-tests.result }}" >> $GITHUB_STEP_SUMMARY
+          fi
+
+      - name: Fail if any tests failed
+        if: |
+          needs.backend-unit-tests.result == 'failure' ||
+          needs.frontend-unit-tests.result == 'failure' ||
+          needs.integration-tests.result == 'failure' ||
+          needs.e2e-tests.result == 'failure'
+        run: exit 1
