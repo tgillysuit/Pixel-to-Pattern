@@ -42,7 +42,7 @@ jobs:
         with:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GHCR_TOKEN }}
 
       # Backend Image
       - name: Extract metadata for backend
@@ -100,7 +100,7 @@ jobs:
         with:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USERNAME }}
-          key: ${{ secrets.VM_PASSWORD }}
+          password: ${{ secrets.VM_PASSWORD }}
           port: ${{ secrets.VM_SSH_PORT || 22 }}
           script: |
             set -e
@@ -112,22 +112,22 @@ jobs:
             cd ${{ secrets.VM_PROJECT_PATH }}
             
             # Log in to GHCR
-            echo ${{ secrets.GHCR_PAT }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
+            echo ${{ secrets.GHCR_TOKEN }} | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
             
             # Pull latest images
             echo "--- Pulling latest images ---"
             docker compose -f docker-compose.deploy.yml pull
             
             # Stop current containers gracefully
-            echo "=== Stopping current containers ==="
+            echo "--- Stopping current containers ---"
             docker compose -f docker-compose.deploy.yml down --timeout 30
             
             # Start new containers
-            echo "=== Starting new containers ==="
+            echo "--- Starting new containers ---"
             docker compose -f docker-compose.deploy.yml up -d
             
             # Clean up old images
-            echo "=== Cleaning up old images ==="
+            echo "--- Cleaning up old images ---"
             docker image prune -f
             
             echo "--- Deployment complete ---"
@@ -139,12 +139,12 @@ jobs:
         with:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USERNAME }}
-          key: ${{ secrets.VM_SSH_PRIVATE_KEY }}
+          password: ${{ secrets.VM_PASSWORD }}
           port: ${{ secrets.VM_SSH_PORT || 22 }}
           script: |
             set -e
             
-            echo "=== Verifying deployment ==="
+            echo "--- Verifying deployment ---"
             
             # Wait for containers to be ready
             sleep 10
@@ -152,7 +152,7 @@ jobs:
             # Check if containers are running
             cd ${{ secrets.VM_PROJECT_PATH }}
             
-            echo "=== Container status ==="
+            echo "--- Container status ---"
             docker compose -f docker-compose.deploy.yml ps
             
             # Check container health
@@ -183,7 +183,7 @@ jobs:
               echo "FAILED! Backend health check failed (may still be starting)"
             fi
             
-            echo "=== Deployment verified successfully ==="
+            echo "--- Deployment verified successfully ---"
 
       - name: Deployment summary
         run: |
