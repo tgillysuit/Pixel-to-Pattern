@@ -104,7 +104,9 @@ jobs:
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm run cypress:run
+        run: |
+          npm install cypress
+          npm run cypress:run
         env:
           CYPRESS_BASE_URL: http://localhost:3001
 
