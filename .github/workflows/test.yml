@@ -102,8 +102,8 @@ jobs:
         with:
           node-version: '24'
           cache: 'npm'
-
-      - name: Install dependencies
+      - name: Run Cypress
+        uses: actions/
         run: npm run cypress:run
         env:
           CYPRESS_BASE_URL: http://localhost:3001
