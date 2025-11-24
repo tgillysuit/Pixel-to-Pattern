@@ -132,6 +132,8 @@ jobs:
             
             echo "--- Deployment complete ---"
 
+            exit
+
       - name: Verify deployment
         uses: appleboy/ssh-action@v1.0.3
         with:
