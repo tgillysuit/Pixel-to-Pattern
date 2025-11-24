@@ -132,9 +132,6 @@ jobs:
             
             echo "--- Deployment complete ---"
 
-            exit
-            EOF
-
       - name: Verify deployment
         uses: appleboy/ssh-action@v1.0.3
         with:
@@ -170,18 +167,19 @@ jobs:
             fi
             
             # Health check - verify frontend is responding
-            echo "=== Health check ==="
+            echo "--- Health check ---"
             if curl -sSf http://localhost:3001 > /dev/null 2>&1; then
               echo "PASSED! Frontend is responding"
             else
               echo "FAILED! Frontend health check failed (may still be starting)"
             fi
             
-            # Health check - verify backend is responding  
-            if curl -sSf http://localhost:3000/health > /dev/null 2>&1 || curl -sSf http://localhost:3000 > /dev/null 2>&1; then
-              echo "PASSED! Backend is responding"
+            # Check if backend container is running (no endpoint check)
+            if docker compose -f docker-compose.deploy.yml ps backend | grep -q "Up"; then
+              echo "PASSED! Backend container is running"
             else
-              echo "FAILED! Backend health check failed (may still be starting)"
+              echo "FAILED! Backend container is not running!"
+              exit 1
             fi
             
             echo "--- Deployment verified successfully ---"
