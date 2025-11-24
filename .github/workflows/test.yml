@@ -105,7 +105,7 @@ jobs:
       - name: Install npm dependencies
       - run: npm ci
       - name: Run Cypress
-        run:npm run cypress:run
+        run: npm run cypress:run
         env:
           CYPRESS_BASE_URL: http://localhost:3001
 
